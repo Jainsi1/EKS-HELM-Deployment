@@ -36,19 +36,19 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    eks-dev-instance = {
+    eks-first-instance = {
       min_size     = var.managed_nodes_min_capacity
       max_size     = var.managed_nodes_max_capacity
       desired_size = var.managed_nodes_desired_capacity
-      disk_size    = var.ebs_disk_size
-      instance_types = var.managed_nodes_instance_type_list
+      disk_size    = 30
+      instance_types = ["t3.large"]
       capacity_type  = var.managed_nodes_capacity_type
       ebs_optimized           = true
       block_device_mappings = {
         xvda = {
           device_name = "/dev/xvda"
           ebs = {
-            volume_size           = var.ebs_disk_size
+            volume_size           = 30
             volume_type           = "gp3"
             iops                  = 3000
             throughput            = 150
@@ -56,7 +56,63 @@ module "eks" {
           }
         }
       }
-      # labels = var.managed_nodes_tags
+      labels = {
+        sonarqube = "true"
+      }
+      tags = {
+        ExtraTag = "EKS managed node group",
+      }
+    }
+    eks-second-instance = {
+      min_size     = var.managed_nodes_min_capacity
+      max_size     = var.managed_nodes_max_capacity
+      desired_size = var.managed_nodes_desired_capacity
+      disk_size    = 30
+      instance_types = ["t3.xlarge"]
+      capacity_type  = var.managed_nodes_capacity_type
+      ebs_optimized           = true
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 30
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 150
+            delete_on_termination = true
+          }
+        }
+      }
+      labels = {
+        defectdojo = "true"
+      }
+      tags = {
+        ExtraTag = "EKS managed node group",
+      }
+    }
+    eks-third-instance = {
+      min_size     = var.managed_nodes_min_capacity
+      max_size     = var.managed_nodes_max_capacity
+      desired_size = var.managed_nodes_desired_capacity
+      disk_size    = 30
+      instance_types = ["t3.2xlarge"]
+      capacity_type  = var.managed_nodes_capacity_type
+      ebs_optimized           = true
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 30
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 150
+            delete_on_termination = true
+          }
+        }
+      }
+      labels = {
+        dependencyTrack = "true"
+      }
       tags = {
         ExtraTag = "EKS managed node group",
       }
