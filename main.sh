@@ -15,23 +15,18 @@ kubectl set image deployment cluster-autoscaler \
   cluster-autoscaler=registry.k8s.io/autoscaling/cluster-autoscaler:v1.25.0
 helm upgrade -i metrics-server metrics-server/ -n utilities 
 
-# Extract the names of the nodes
-node_names=$(kubectl get nodes | awk 'NR>1 {print $1}')
-
-# Extract the first node and label it as sonarqube=true
-first_node=$(echo "$node_names" | head -n 1)
-kubectl label nodes "$first_node" sonarqube="true"
-
-# Install the sonarqube halm chart
+# Install the sonarqube helm chart
 helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
 helm repo update
 kubectl create namespace apps || true
 helm upgrade -i sonarqube sonarqube/sonarqube -n apps --values sonarqube/values.yaml
 
-# Extract the second node and label it as DefectDojo=true
-second_node=$(echo "$node_names" | sed -n '2p')
-kubectl label nodes "$second_node" DefectDojo="true"
+# Install the dependency track helm chart
+helm repo add evryfs-oss https://evryfs.github.io/helm-charts/
+helm repo update
+helm upgrade -i dependency-track evryfs-oss/dependency-track -n apps --values dependency-track/values.yaml
 
-# Extract the third node and label it as DependencyTrack=true
-third_node=$(echo "$node_names" | sed -n '3p')
-kubectl label nodes "$third_node" DependencyTrack="true"
+# Install the defect dojo helm chart
+helm repo add defectdojo 'https://raw.githubusercontent.com/DefectDojo/django-DefectDojo/helm-charts'
+helm repo update
+helm upgrade -i defectdojo defectdojo/defectdojo -n apps --values defectdojo/values.yaml
